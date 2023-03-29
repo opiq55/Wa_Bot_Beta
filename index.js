@@ -7,7 +7,7 @@ const axios = require('axios');
 const path = require('path');
 const { Socket } = require('dgram');
 const configuration = new Configuration({
-  apiKey: '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',
+  apiKey: 'key',
 });
 const schedule = require('node-schedule');
 const openai = new OpenAIApi(configuration);
