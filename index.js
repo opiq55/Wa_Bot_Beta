@@ -69,7 +69,7 @@ const EditPhotoRequest = async (base64, bg_color) => {
         headers: {
             "accept": "application/json",
             "Content-Type": "application/json",
-            "X-Api-Key": "HPVm7aMG9umzruKgwLuQRPqL",
+            "X-Api-Key": "api-key remove bg",
         },
     })
         .then((response) => {
@@ -91,38 +91,66 @@ const EditPhotoRequest = async (base64, bg_color) => {
 function main(){
     client.on('message', async (msg) => {
         if(msg.body.includes('/ask')){
-            let qst = `Q: ${msg.body}\nA:`;
-            const response = await openai.createCompletion({
-                model: "text-davinci-003",
-                prompt: qst,
-                temperature: 0,
-                max_tokens: 300,
-                top_p: 1.0,
-                frequency_penalty: 0.0,
-                presence_penalty: 0.0,
-            });
-            msg.reply(response.data.choices[0].text);
-           
-
+            try {
+                let qst = `Q: ${msg.body}\nA:`;
+                const response = await openai.createCompletion({
+                  model: "text-davinci-003",
+                  prompt: qst,
+                  temperature: 0,
+                  max_tokens: 300,
+                  top_p: 1.0,
+                  frequency_penalty: 0.0,
+                  presence_penalty: 0.0,
+                });
+                msg.reply(response.data.choices[0].text);
+              } catch (error) {
+                if (error.response) {
+                  console.log(error.response.status);
+                  console.log(error.response.data);
+                  console.log(`${error.response.status}\n\n${error.response.data}`);
+                }else{
+                  console.log(error);
+                  msg.sendMessage("Maaf terjadi kesalahan :" + error.message);
+                }
+                msg.reply("Maaf terjadi kesalahan: " + error.message);
+              }
         }else if(msg.body === '/menu'){
             let menu = `----------- Menu -----------\n\n/ask (masukkan pertanyaan)\n/draw (masukkan deskripsi)\n/sticker\n/sendto (62...) (pesan)\n/meme\n/edit_bg (warna)`;
             msg.reply(menu);
-        }else if(msg.body.startsWith('/sticker') && msg.type =='image'){
-            const media = await msg.downloadMedia();
-            client.sendMessage(msg.from, media,{
-                sendMediaAsSticker: true,
-            });
+        }else if(msg.body.startsWith('/sticker')){
+            const gambar = msg.type == 'image';
+            if (gambar){
+                msg.reply("Tunggu Sebentar ya");
+                const media = await msg.downloadMedia();
+                client.sendMessage(msg.from, media, {
+                    sendMediaAsSticker: true,
+                });
+            }else{
+                msg.reply("Ini bukan format image kakak"); 
+            }
         }else if(msg.body.includes('/draw')) {
-            let text = msg.body.split('/draw')[1];
-            let qst = `Q: ${text}\nA:`;
-            const response = await openai.createImage({
-                prompt: qst,
-                n: 1,
-                size: '1024x1024'
-            });
-            var imgurl = response.data.data[0].url;
-            const media = await MessageMedia.fromUrl(imgurl);
-            await client.sendMessage(msg.from, media, text)
+            try {
+                let text = msg.body.split('/draw')[1];
+                let qst = `Q: ${text}\nA:`;
+                const response = await openai.createImage({
+                  prompt: qst,
+                  n: 1,
+                  size: '1024x1024'
+                });
+                var imgurl = response.data.data[0].url;
+                const media = await MessageMedia.fromUrl(imgurl);
+                await client.sendMessage(msg.from, media, text);
+              } catch (error) {
+                if (error.response) {
+                  console.log(error.response.status);
+                  console.log(error.response.data);
+                  console.log(`${error.response.status}\n\n${error.response.data}`);
+                }else{
+                  console.log(error);
+                  msg.sendMessage("Maaf terjadi kesalahan :" + error.message);
+                }
+                msg.reply("Maaf terjadi kesalahan: " + error.message);
+              }
         
         }else if(msg.body === "/meme"){
             const meme = await axios ("https://meme-api.com/gimme")
