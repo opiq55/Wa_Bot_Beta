@@ -8,7 +8,7 @@ const path = require('path');
 const puppeteer = require('puppeteer');
 const { Socket } = require('dgram');
 const configuration = new Configuration({
-  apiKey: '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',
+  apiKey: 'key',
 });
 const schedule = require('node-schedule');
 const openai = new OpenAIApi(configuration);
